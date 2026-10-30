@@ -1,7 +1,5 @@
 # TizenTube — Old Tizen
 
-[![Downloads](https://img.shields.io/github/downloads/numbereleven-a/TizenTube-old-tizen/total?label=Downloads)](https://github.com/numbereleven-a/TizenTube-old-tizen/releases)
-
 [English README](README.md)
 
 Это форк [reisxd/TizenTube](https://github.com/reisxd/TizenTube), основанный на **TizenTube Standalone v2.1.1** и переделанный для старых телевизоров Samsung. Главное отличие — **воспроизведение YouTube с работающим SponsorBlock на Tizen 2.4.0**. Также сохранены последующие изменения модулей исходного проекта.
@@ -105,3 +103,5 @@ tizen package -t wgt -s YOUR_CERTIFICATE_PROFILE -o artifacts/2.4.0/signed -- le
 ```
 
 Релиз собирается из загрузчика `legacy/widget`. Старые каталоги `standalone` и исходники сервисов сохранены из upstream и в этот WGT не включены.
+
+[![Downloads](https://img.shields.io/github/downloads/numbereleven-a/TizenTube-old-tizen/total?label=Downloads)](https://github.com/numbereleven-a/TizenTube-old-tizen/releases)
