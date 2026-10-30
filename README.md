@@ -1,5 +1,7 @@
 # TizenTube — Old Tizen
 
+[![Downloads](https://img.shields.io/github/downloads/numbereleven-a/TizenTube-old-tizen/total?label=Downloads)](https://github.com/numbereleven-a/TizenTube-old-tizen/releases)
+
 [README на русском](README_RU.md)
 
 This is a fork of [reisxd/TizenTube](https://github.com/reisxd/TizenTube), based on **TizenTube Standalone v2.1.1** and adapted for older Samsung TVs. Its main difference is **YouTube playback with SponsorBlock on Tizen 2.4.0**. Later upstream module changes are also retained.
