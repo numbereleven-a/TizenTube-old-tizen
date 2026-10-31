@@ -1,4 +1,62 @@
 {
+    "settingsStorageError": "As configurações mudaram nesta sessão, mas não puderam ser salvas na memória da TV.",
+    "cdnJournal": {
+        "title": "CDNs com problemas",
+        "counter": "GGC com problemas: {{count}}",
+        "added": "GGC com problemas adicionado · Total: {{count}}",
+        "header": "Salvos: {{count}} / 50 · Falhas repetidas, não bloqueios confirmados",
+        "collect": "Coletar domínios GGC com problemas",
+        "showCount": "Mostrar a contagem de GGC com problemas quando houver",
+        "enabled": "Coleta ativada",
+        "disabled": "Coleta desativada",
+        "close": "Fechar",
+        "row": "Falhas: {{count}} · Última: {{date}}",
+        "details": "Falhas: {{count}} · Modo: {{mode}} · {{reason}} · Primeira: {{first}} · Última: {{last}}",
+        "empty": "Nenhuma entrada",
+        "remove": "Excluir entrada",
+        "clear": "Limpar todas as entradas",
+        "clearQuestion": "Limpar o registro de CDNs?",
+        "cancel": "Cancelar",
+        "back": "Voltar à lista",
+        "storageError": "Não foi possível salvar o registro na memória da TV",
+        "reasons": {
+            "dns": "Erro de DNS",
+            "tcp": "Erro de TCP",
+            "tls": "Erro de TLS",
+            "timeout": "Tempo da solicitação esgotado",
+            "truncated": "Resposta incompleta",
+            "tls-wait": "Espera longa para concluir o TLS",
+            "response-wait": "Espera longa pelos cabeçalhos da resposta"
+        }
+    },
+    "legacyNetwork": {
+        "extendedDiagnostics": "Diagnóstico detalhado",
+        "title": "Conexão TLS",
+        "status": "Interface/API (NaCl): {{api}} · Vídeo (NaCl): {{video}} · Sistema: desconhecido",
+        "scope": "Vale para novas solicitações HTTPS via NaCl. Reinicie a reprodução para substituir as conexões abertas. O TLS dos recursos do sistema é desconhecido.",
+        "playerVideo": "Googlevideo: {{transport}}",
+        "playerAudio": "Áudio: {{transport}}",
+        "indicators": "Indicadores do player",
+        "showProtocol": "Mostrar o protocolo de reprodução",
+        "showSponsorStatus": "Mostrar a disponibilidade do SponsorBlock",
+        "statusDisplay": {
+            "never": "Nunca",
+            "unavailable": "Só quando estiver indisponível",
+            "always": "Sempre"
+        },
+        "sponsorStatus": {
+            "checking": "SponsorBlock: verificando…",
+            "available": "SponsorBlock: disponível",
+            "unavailable": "SponsorBlock: indisponível",
+            "disabled": "SponsorBlock: desativado"
+        },
+        "unknown": "desconhecido",
+        "modes": {
+            "auto": "Automático (TLS 1.3 / 1.2)",
+            "1_2": "Forçar TLS 1.2",
+            "1_3": "Forçar TLS 1.3"
+        }
+    },
     "__contributors": [
         "yufumo"
     ],
@@ -7,13 +65,14 @@
             "socialMedia": {
                 "title": "Redes Sociais",
                 "qrCodeScanMessage": "Você pode acessar a página {{name}} lendo o QR Code abaixo.",
-                "announcements": "Announcements",
-                "group": "Group",
-                "website": "Website",
+                "announcements": "Anúncios",
+                "group": "Grupo",
+                "website": "Site",
                 "githubSponsors": "GitHub Sponsors"
             },
             "adBlock": "Bloqueador de Anúncios",
             "sponsorblock": {
+                "manualKey": "Amarelo / 3",
                 "title": "Configurações do SponsorBlock",
                 "options": {
                     "enableSB": "Ativar SponsorBlock",
@@ -81,10 +140,10 @@
                             "enableVPUIPatching": "Ativar Correção da Interface do Reprodutor de Vídeo",
                             "previousNextBtns": "Ativar Botões de Avançar/Retroceder",
                             "showSuperThxBtn": "Mostrar Botão de Valeu Demais",
+                            "showAIAskBtn": "Mostrar o botão Perguntar",
                             "showSpeedCtrlBtn": "Mostrar Botão de Controle de Velocidade",
-                            "showAIAskBtn": "Show Ask Button",
-                            "addMPBtn": "Show Mini Player Button",
-                            "swapMPWithPIP": "Swap Mini Player Button with PiP Button"
+                            "addMPBtn": "Mostrar o botão do miniplayer",
+                            "swapMPWithPIP": "Trocar o botão do miniplayer pelo de picture-in-picture"
                         }
                     },
                     "preferredVideoQuality": {
@@ -104,10 +163,16 @@
                         "title": "Duração da Pausa da Taxa de Quadros Automática",
                         "subtitle": "Defina a duração (em segundos) da pausa na reprodução do vídeo ao ajustar a taxa de quadros"
                     },
-                    "codecAny": "Any",
-                    "qualityAuto": "Auto",
-                    "hideRelatedVideosPlayer": "Hide Related Videos"
+                    "codecAny": "Qualquer",
+                    "qualityAuto": "Automática",
+                    "hideRelatedVideosPlayer": "Ocultar vídeos relacionados"
                 }
+            },
+            "time": {
+                "second": "{{count}} segundo",
+                "seconds": "{{count}} segundos",
+                "minute": "{{count}} minuto",
+                "minutes": "{{count}} minutos"
             },
             "uiSettings": {
                 "title": "Configurações da Interface de Usuário",
@@ -142,54 +207,54 @@
                         "title": "Desativar Conteúdos da Barra Lateral",
                         "subtitle": "Selecione os conteúdos da barra lateral para ocultar"
                     },
+                    "sortSidebarContents": {
+                        "title": "Organizar a barra lateral",
+                        "subtitle": "Reordene os itens da barra lateral do seu jeito",
+                        "moveUp": {
+                            "title": "Mover para cima",
+                            "subtitle": "Sobe este item na barra lateral"
+                        },
+                        "moveDown": {
+                            "title": "Mover para baixo",
+                            "subtitle": "Desce este item na barra lateral"
+                        },
+                        "addToSidebar": "Adicionar canal à barra lateral",
+                        "removeFromSidebar": "Remover canal da barra lateral"
+                    },
                     "launchToOnStartup": {
                         "title": "Página Inicial ao Abrir",
                         "subtitle": "Escolha a página padrão que o TizenTube abrirá na inicialização"
                     },
-                    "sortSubscriptionsByAlphabet": "Sort Subscriptions Alphabetically",
                     "categories": {
-                        "search": "Search",
-                        "home": "Home",
-                        "sports": "Sports",
-                        "news": "News",
-                        "music": "Music",
+                        "search": "Pesquisar",
+                        "home": "Início",
+                        "sports": "Esportes",
+                        "news": "Notícias",
+                        "music": "Música",
                         "podcasts": "Podcasts",
-                        "moviesAndTv": "Movies & TV",
-                        "live": "Live",
-                        "gaming": "Gaming",
-                        "subscriptions": "Subscriptions",
-                        "library": "Library",
-                        "more": "More",
+                        "moviesAndTv": "Filmes e TV",
+                        "live": "Ao vivo",
+                        "gaming": "Jogos",
+                        "subscriptions": "Inscrições",
+                        "library": "Biblioteca",
+                        "more": "Mais",
                         "shorts": "Shorts",
-                        "searchResults": "Search Results"
+                        "searchResults": "Resultados da pesquisa"
                     },
-                    "disableChannelsOnSidebar": "Disable Channels on Sidebar",
+                    "sortSubscriptionsByAlphabet": "Ordenar inscrições em ordem alfabética",
+                    "disableChannelsOnSidebar": "Desativar canais na barra lateral",
                     "clock": {
-                        "title": "Clock",
-                        "subtitle": "Display a clock on the screen",
+                        "title": "Relógio",
+                        "subtitle": "Mostra um relógio na tela",
                         "options": {
-                            "enableClock": "Enable Clock",
-                            "isClock12HourFormat": "Use 12-Hour Format for Clock",
-                            "clockShowSeconds": "Show Seconds on Clock",
-                            "clockHideWhenVideoPlaying": "Hide Clock While Video is Playing"
+                            "enableClock": "Ativar relógio",
+                            "isClock12HourFormat": "Usar o formato de 12 horas",
+                            "clockShowSeconds": "Mostrar os segundos",
+                            "clockHideWhenVideoPlaying": "Ocultar o relógio durante o vídeo"
                         }
                     },
-                    "disableEnlargingThumbnails": "Disable Enlarged Thumbnails",
-                    "enableShrinkingThumbnails": "Enable Shrinked Thumbnails",
-                    "sortSidebarContents": {
-                        "title": "Sort Sidebar Contents",
-                        "subtitle": "Reorder sidebar contents to your preference",
-                        "moveUp": {
-                            "title": "Move Up",
-                            "subtitle": "Move this item up in the sidebar"
-                        },
-                        "moveDown": {
-                            "title": "Move Down",
-                            "subtitle": "Move this item down in the sidebar"
-                        },
-                        "addToSidebar": "Add Channel to Sidebar",
-                        "removeFromSidebar": "Remove Channel from Sidebar"
-                    }
+                    "disableEnlargingThumbnails": "Desativar miniaturas ampliadas",
+                    "enableShrinkingThumbnails": "Ativar miniaturas reduzidas"
                 }
             },
             "updater": {
@@ -201,36 +266,30 @@
                     "checkForUpdatesOnStartup": "Verificar Atualizações na Inicialização"
                 },
                 "updateAvailable": {
-                    "title": "Update Available",
-                    "subtitle": "A new version of TizenTube Cobalt is available: {{latestVersion}}, current: {{currentVersion}}"
+                    "title": "Atualização disponível",
+                    "subtitle": "Há uma nova versão do TizenTube Cobalt: {{latestVersion}} (atual: {{currentVersion}})"
                 },
-                "releaseDate": "Release Date: {{date}}",
+                "releaseDate": "Data de lançamento: {{date}}",
                 "updateNow": {
-                    "title": "Update Now",
-                    "subtitle": "Click to download the latest version."
+                    "title": "Atualizar agora",
+                    "subtitle": "Clique para baixar a versão mais recente."
                 },
                 "remindLater": {
-                    "title": "Remind Me Later",
-                    "subtitle": "Check for updates later."
+                    "title": "Lembrar mais tarde",
+                    "subtitle": "Verificar atualizações mais tarde."
                 },
                 "upToDate": {
-                    "title": "TizenTube is up to date",
-                    "subtitle": "You are using the latest version ({{version}}) of TizenTube Cobalt."
+                    "title": "O TizenTube está atualizado",
+                    "subtitle": "Você está usando a versão mais recente ({{version}}) do TizenTube Cobalt."
                 },
                 "checkFailed": {
-                    "title": "TizenTube update check failed",
-                    "subtitle": "Could not check for updates."
+                    "title": "Falha ao verificar atualizações do TizenTube",
+                    "subtitle": "Não foi possível verificar se há atualizações."
                 },
                 "downloading": {
-                    "title": "TizenTube Update",
-                    "subtitle": "Downloading update, please wait..."
+                    "title": "Atualização do TizenTube",
+                    "subtitle": "Baixando a atualização, aguarde..."
                 }
-            },
-            "time": {
-                "second": "{{count}} second",
-                "seconds": "{{count}} seconds",
-                "minute": "{{count}} minute",
-                "minutes": "{{count}} minutes"
             }
         },
         "ttSettings": {
@@ -276,33 +335,34 @@
     },
     "player": {
         "playbackSpeed": {
-            "title": "Playback Speed",
-            "button": "Speed Controls",
-            "fixStuttering": "Fix stuttering (1.0001x)"
+            "title": "Velocidade de reprodução",
+            "button": "Controles de velocidade",
+            "fixStuttering": "Corrigir travadas (1.0001x)"
         },
-        "miniPlayer": "Mini Player",
-        "pictureInPicture": "Picture in Picture",
-        "previous": "Previous",
-        "next": "Next",
-        "withTizenTube": "with TizenTube",
+        "miniPlayer": "Miniplayer",
+        "pictureInPicture": "Picture-in-picture",
+        "previous": "Anterior",
+        "start": "Voltar ao início",
+        "next": "Próximo",
+        "withTizenTube": "com TizenTube",
         "share": {
-            "title": "Share",
-            "button": "Share",
-            "qrCodeScanMessage": "Scan the QR code below to share this video."
+            "title": "Compartilhar",
+            "button": "Compartilhar",
+            "qrCodeScanMessage": "Leia o QR Code abaixo para compartilhar este vídeo."
         },
-        "screenOff": "Turn off screen"
-    },
-    "toasts": {
-        "videoAddedToQueue": "Video added to queue.",
-        "videoQueueCleared": "Video queue cleared.",
-        "sidebarContentsUpdated": {
-            "title": "Sidebar Contents Updated",
-            "subtitle": "The sidebar contents have been updated."
-        },
-        "feedbackSent": "Feedback sent."
+        "screenOff": "Desligar a tela"
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Não tenho interesse",
+        "dontRecommendChannel": "Não recomendar este canal"
+    },
+    "toasts": {
+        "videoAddedToQueue": "Vídeo adicionado à fila.",
+        "videoQueueCleared": "Fila de vídeos limpa.",
+        "feedbackSent": "Feedback enviado.",
+        "sidebarContentsUpdated": {
+            "title": "Barra lateral atualizada",
+            "subtitle": "Os itens da barra lateral foram atualizados."
+        }
     }
 }
