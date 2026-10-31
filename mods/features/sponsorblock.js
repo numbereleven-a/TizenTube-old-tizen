@@ -486,7 +486,7 @@ class SponsorBlockHandler {
     const display = segment ? 'block' : 'none';
     if (this.manualButton.style.display !== display) this.manualButton.style.display = display;
     if (segment) {
-      const text = t('sponsorblock.manualKey') + ': ' + t('sponsorblock.toasts.skip', { segment: t(`sponsorblock.segments.${segment.category}`) });
+      const text = t('settings.options.sponsorblock.manualKey') + ': ' + t('sponsorblock.toasts.skip', { segment: t(`sponsorblock.segments.${segment.category}`) });
       if (this.manualButton.textContent !== text) this.manualButton.textContent = text;
     }
   }
