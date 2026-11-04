@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.5.0
+
+### Playback and memory
+
+- Released binary-response buffers and reported XHR errors when final response assembly fails.
+- Cleared stale buffering feedback when buffered playback continues or recovers.
+
+### Startup
+
+- Kept the startup watchdog active until the YouTube application initializes, with a restart screen if initialization times out.
+
 ## v2.4.1
 
 ### Performance

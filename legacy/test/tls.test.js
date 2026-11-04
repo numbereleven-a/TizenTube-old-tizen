@@ -35,6 +35,29 @@ function setup(mode = 'auto', options = { extendedDiagnostics: true }) {
     return { win, transport, sent, log, message, close() { for (const t of timers) clearTimeout(t); } };
 }
 
+test('Binary assembly failure releases buffers and reports an XHR error', () => {
+    function LimitedBytes(value) {
+        if (typeof value === 'number') throw new RangeError('Synthetic allocation failure');
+        return new Uint8Array(value);
+    }
+    LimitedBytes.prototype = Uint8Array.prototype;
+    const env = setup('auto', { Uint8Array: LimitedBytes });
+    try {
+        const xhr = new env.win.XMLHttpRequest(), events = [];
+        for (const type of ['error', 'load', 'loadend']) xhr.addEventListener(type, () => events.push(type));
+        xhr.open('GET', 'https://media.googlevideo.com/videoplayback'); xhr.responseType = 'arraybuffer'; xhr.send();
+        const id = env.sent.at(-1).id;
+        env.message({ type: 'headers', id, status: 200, headers: 'Transfer-Encoding: chunked\r\n' });
+        for (let i = 0; i < 2; i++) env.message({ type: 'data', id, body: new Uint8Array([1, 2]).buffer });
+        assert.doesNotThrow(() => env.message({ type: 'done', id }));
+        assert.deepEqual(events, ['error', 'loadend']);
+        assert.equal(xhr.readyState, 4); assert.equal(xhr.status, 0); assert.equal(xhr.response, null);
+        assert.equal(env.win.__legacyXHRMemory().pendingBytes, 0);
+        assert.equal(env.win.__legacyXHRMemory().pendingRequests, 0);
+        assert.equal(env.transport.summary().active, 0);
+    } finally { env.close(); }
+});
+
 test('Bulk cancellation schedules one pump and releases every media slot', () => {
     const timerSchedules=[],env=setup('1.3',{timerSchedules});
     try {

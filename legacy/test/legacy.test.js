@@ -549,6 +549,7 @@ test('widget starts with mods and keeps baseline playback in diagnostics', () =>
     const elements = {};
     let panelWrites = 0;
     let navigation;
+    const bootTimers = new Map();
     for (const id of ['player', 'setup', 'connect', 'baseline', 'options', 'status', 'feedback', 'feedback-text', 'busy-spinner']) {
         elements[id] = { style: {}, focus() {}, removeAttribute(name) { delete this[name]; } };
     }
@@ -563,7 +564,8 @@ test('widget starts with mods and keeps baseline playback in diagnostics', () =>
         window: {}, location: { href: 'file:///index.html' }, XMLHttpRequest: XHR, LegacyLogger: Logger,
         LegacyTLS: { create: () => ({ install() {} }) },
         document: { getElementById: id => elements[id], addEventListener() {} },
-        setTimeout: (callback, delay) => { if (delay === 0) navigation = callback; return 1; }, clearTimeout() {}
+        setTimeout: (callback, delay) => { if (delay === 0) navigation = callback; if (delay === 35000) bootTimers.set(1, callback); return 1; },
+        clearTimeout(id) { bootTimers.delete(id); }
     };
     vm.runInNewContext(fs.readFileSync(path.resolve(__dirname, '../widget/widget.js'), 'utf8'), context);
     assert.equal(requests.length, 1);
@@ -575,6 +577,12 @@ test('widget starts with mods and keeps baseline playback in diagnostics', () =>
     assert.equal(elements.player.src, 'file:///player.html');
     elements.player.onload();
     assert.equal(elements.player.onload, null);
+    context.window.__legacyLog.record('page.start', 'Frame only');
+    assert.equal(bootTimers.size, 1, 'Frame startup must not disable the YouTube watchdog');
+    context.window.__legacyReady({});
+    assert.equal(bootTimers.size, 1, 'An unrelated frame must not disable the watchdog');
+    context.window.__legacyReady(elements.player.contentWindow);
+    assert.equal(bootTimers.size, 0);
     assert.match(frameHtml, /userScript\.js/);
     assert.match(frameHtml, /lazy-debug-watermark/);
     assert.equal(elements.setup.style.display, 'none');
@@ -590,6 +598,9 @@ test('widget starts with mods and keeps baseline playback in diagnostics', () =>
     requests[1].onload();
     elements.player.onload();
     assert.doesNotMatch(frameHtml, /userScript\.js/);
+    bootTimers.get(1)();
+    assert.equal(elements.setup.style.display, 'block');
+    assert.match(elements.status.textContent, /did not start/);
     context.window.__legacyCommand(406);
     elements.connect.onclick();
     requests[2].onerror();
@@ -744,22 +755,28 @@ test('loading feedback follows media events and visible spinners', () => {
     const spinner = { nodeType: 1, parentNode: null, getBoundingClientRect: () => ({ width: 50, height: 50 }) };
     let spinnerVisible = false;
     let removed = 0, now = 1000;
-    const video = { currentTime: 0, buffered: { length: 0 }, addEventListener: (type, fn) => {
+    const video = { currentTime: 0, readyState: 2, buffered: { length: 0 }, addEventListener: (type, fn) => {
         if (!mediaEvents[type]) mediaEvents[type] = [];
         mediaEvents[type].push(fn);
     }, removeEventListener(type, fn) { removed++; mediaEvents[type] = mediaEvents[type].filter(f => f !== fn); } };
     let currentVideo = video;
     const log = Logger.create(20);
     function fire(type) { mediaEvents[type].forEach(fn => fn()); }
+    let readyCalls = 0;
     const window = { addEventListener: (type, fn) => { events[type] = fn; }, getComputedStyle: () => ({ display: spinnerVisible ? 'block' : 'none', visibility: 'visible', opacity: '1' }) };
     vm.runInNewContext(fs.readFileSync(path.resolve(__dirname, '../web/frame.js'), 'utf8'), {
-        window, parent: { __legacyLog: log, __legacyStatus: text => statuses.push(text) }, LegacyLogger: Logger,
+        window, parent: { __legacyLog: log, __legacyStatus: text => statuses.push(text), __legacyReady: () => readyCalls++ }, LegacyLogger: Logger,
         Date: { now: () => now },
         document: { addEventListener() {}, querySelector: () => currentVideo, querySelectorAll: () => [spinner] },
         MutationObserver: function () { this.disconnect = () => {}; },
         setInterval: fn => ticks.push(fn), setTimeout() {}
     });
     events.DOMContentLoaded();
+    assert.equal(readyCalls, 0); assert.equal(statuses.length, 0);
+    window._yttv = {};
+    ticks[0](); assert.equal(readyCalls, 0);
+    window._yttv.app = { instance: { resolveCommand() {} } };
+    ticks[0](); assert.equal(readyCalls, 1);
     assert.equal(statuses.at(-1), '');
     fire('loadstart');
     assert.equal(statuses.at(-1), 'Loading video…');
@@ -776,11 +793,17 @@ test('loading feedback follows media events and visible spinners', () => {
     currentVideo = { ...video, currentTime: 12, paused: false, readyState: 4 };
     ticks[0]();
     assert.ok(removed >= 10, 'Replacing video must detach listeners from the previous element');
+    fire('stalled'); ticks[0]();
+    assert.equal(statuses.at(-1), '', 'Network stalls with buffered playback must not show Buffering');
+    currentVideo.readyState = 2;
     fire('waiting');
     assert.equal(statuses.at(-1), 'Buffering…');
     assert.ok(log.read().some(entry => entry.code === 'video.waiting' && /time=12\.0/.test(entry.detail)));
     now += 1500; ticks[0]();
     assert.ok(log.read().some(entry => entry.code === 'video.loop-delay' && /lateMs=1000/.test(entry.detail)));
+    currentVideo.readyState = 4; currentVideo.currentTime++;
+    ticks[0](); assert.equal(statuses.at(-1), '', 'Recovered playback clears stale buffering feedback');
+    assert.equal(readyCalls, 1);
 });
 
 test('Stall diagnostics distinguish track buffers, bound followups and detach on video replacement', () => {

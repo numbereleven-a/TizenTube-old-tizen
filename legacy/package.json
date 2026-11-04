@@ -1,6 +1,6 @@
 {
   "name": "tizentube-legacy",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "private": true,
   "license": "GPL-3.0-only",
   "scripts": {

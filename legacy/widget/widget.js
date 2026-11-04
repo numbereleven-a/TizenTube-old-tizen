@@ -36,12 +36,15 @@
     var pending;
     var widgetBase = location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, '');
     var log = LegacyLogger.create(300, function (entry) {
-        if (entry.code === 'page.start') clearTimeout(bootTimer);
         if (visible && !renderTimer) renderTimer = setTimeout(function () {
             renderTimer = null; render();
         }, 250);
     });
     window.__legacyLog = log;
+    window.__legacyReady = function (frame) {
+        if (frame !== player.contentWindow || setup.style.display !== 'none') return;
+        clearTimeout(bootTimer);
+    };
     var tlsTransport = LegacyTLS.create(document.getElementById('tls-module'), log, function (info) {
         document.getElementById('tls-summary').textContent = 'Mode: ' + info.mode + ' · Interface/API (NaCl): ' + info.api +
             ' · Video (NaCl): ' + info.video + ' · System stack: unknown';
@@ -88,7 +91,7 @@
             html = html.replace(/<body([^>]*)>/i, '$&<script>if(window.ytcfg)ytcfg.set("USE_NET_AJAX_FOR_PING_TRANSPORT",true);</script>' + (mode === 'mods' ? script('userScript.js') : ''));
             bootTimer = setTimeout(function () {
                 menu(); status.textContent = 'YouTube did not start. Press Red / 1 for details.';
-                log.record('page.boot-timeout', 'YouTube diagnostic script did not start');
+                log.record('page.boot-timeout', 'YouTube application did not become ready');
             }, 35000);
             // Render the fetched page from a local frame document.
             player.onload = function () {

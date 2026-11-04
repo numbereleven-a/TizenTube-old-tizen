@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://tizentube.app/legacy-icon-test" version="2.4.1" viewmodes="maximized">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://tizentube.app/legacy-icon-test" version="2.5.0" viewmodes="maximized">
     <name>TizenTube-old-tizen</name>
     <content src="index.html"/>
     <icon src="icon-launcher.png"/>

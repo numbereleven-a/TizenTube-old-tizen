@@ -528,6 +528,8 @@
                             if (self._generation !== generation || self._state !== 4) return;
                             self._event('load', self._length, total);
                             if (self._generation === generation && self._state === 4) self._event('loadend', self._length, total);
+                        } catch (_) {
+                            if (self._sent && self._generation === generation) fail(self, 'error');
                         } finally {
                             if (measured) transport.recordWork(rid, id, 'net.xhr-done', 'bytes=' + length + '; chunks=' + chunks +
                                 '; assembleMs=' + assembleMs + '; elapsedMs=' + (Date.now() - started));

@@ -41,7 +41,18 @@
         var video = null;
         var detachVideo = function () {};
         var mediaStatus = '';
+        var appReady = false;
         function updateStatus() {
+            if (!appReady && parent.__legacyReady) {
+                var app = window._yttv;
+                if (!app || !Object.keys(app).some(function (key) {
+                    var entry = app[key];
+                    return entry && entry.instance && typeof entry.instance.resolveCommand === 'function';
+                })) return;
+                appReady = true;
+                parent.__legacyReady(window);
+                log.record('page.ready', 'YouTube application initialized');
+            }
             var current = document.querySelector('video');
             if (current !== video) {
                 detachVideo(); detachVideo = function () {}; sampleVideo = function () {}; sampleStall = function () {};
@@ -51,6 +62,7 @@
             if (video && /^https?:/i.test(video.currentSrc || '') && parent.__legacyTLS) parent.__legacyTLS.system('video');
             var text = mediaStatus;
             var playing = video && !video.paused && !video.seeking && video.readyState >= 3;
+            if (playing && mediaStatus === 'Buffering…') { mediaStatus = ''; text = ''; }
             if (!text && !playing) {
                 var spinners = document.querySelectorAll('yt-spinner');
                 for (var i = 0; i < spinners.length; i++) {
@@ -116,7 +128,7 @@
             ['loadstart', 'waiting', 'stalled', 'seeking', 'playing', 'canplay', 'seeked', 'emptied', 'ended', 'error'].forEach(function (type) {
                 listen(type, function () {
                     if (type === 'loadstart') mediaStatus = 'Loading video…';
-                    else if (type === 'waiting' || type === 'stalled') mediaStatus = 'Buffering…';
+                    else if (type === 'waiting' || type === 'stalled') mediaStatus = element.readyState < 3 ? 'Buffering…' : '';
                     else if (type === 'seeking') mediaStatus = 'Seeking…';
                     else if (type === 'error') mediaStatus = 'Unable to play video';
                     else mediaStatus = '';
