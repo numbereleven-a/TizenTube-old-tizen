@@ -6,11 +6,11 @@
     "added": "Добавлен проблемный GGC · Всего: {{count}}",
     "header": "Сохранено: {{count}} / 50 · Повторные сбои, не подтверждённые блокировки",
     "collect": "Собирать проблемные домены GGC",
-    "showCount": "Показывать счётчик проблемных GGC, если не ноль",
+    "showCount": "Показывать счётчик проблемных GGC, если их больше нуля",
     "enabled": "Сбор включён",
     "disabled": "Сбор выключен",
     "close": "Закрыть",
-    "row": "Сбоев: {{count}} · Последний: {{date}}",
+    "row": "Сбоев: {{count}} · Последний сбой: {{date}}",
     "details": "Сбоев: {{count}} · Режим: {{mode}} · {{reason}} · Первый: {{first}} · Последний: {{last}}",
     "empty": "Записей нет",
     "remove": "Удалить запись",
@@ -46,12 +46,12 @@
                 "qrCodeScanMessage": "Вы можете перейти на страницу {{name}} отсканировав QR-код ниже.",
                 "announcements": "Объявления",
                 "group": "Группа",
-                "website": "Вебсайт",
+                "website": "Сайт",
                 "githubSponsors": "Спонсоры GitHub"
             },
             "adBlock": "Блокировка рекламы",
             "sponsorblock": {
-    "manualKey": "Жёлтая / 3",
+    "manualKey": "Жёлтая кнопка или 3",
                 "title": "Настройки SponsorBlock",
                 "options": {
                     "enableSB": "Включить SponsorBlock",
@@ -59,8 +59,8 @@
                     "segments": "Сегменты",
                     "categories": {
                         "sponsor": "Пропускать спонсорские сегменты",
-                        "intro": "Пропустить интро",
-                        "outro": "Пропустить аутро",
+                        "intro": "Пропускать вступления",
+                        "outro": "Пропускать концовки",
                         "interaction": "Пропускать напоминание о взаимодействии",
                         "selfpromo": "Пропускать саморекламу",
                         "preview": "Пропускать превью/рекап",
@@ -98,7 +98,7 @@
                     "shorts": "Shorts",
                     "videoPreviews": "Предпросмотр видео",
                     "ttWelcomeMsg": "Приветственное сообщение",
-                    "guestSignInReminder": "Напоминания о гостевом входе",
+                    "guestSignInReminder": "Напоминать о входе в аккаунт",
                     "reloadHomeOnStartup": "Обновлять главную при запуске"
                 }
             },
@@ -118,7 +118,7 @@
                         "options": {
                             "enableVPUIPatching": "Включить патч интерфейса",
                             "previousNextBtns": "Кнопки Предыдущее/Следующее",
-                            "showSuperThxBtn": "Кнопка Супер Спасибо",
+                            "showSuperThxBtn": "Кнопка «Суперспасибо»",
                             "showAIAskBtn": "Показать кнопку Gemini",
                             "showSpeedCtrlBtn": "Кнопка скорости",
                             "addMPBtn": "Отображать мини-плеер",
@@ -306,9 +306,9 @@
             "poi_highlight": "ключевой момент"
         },
         "toasts": {
-            "skipping": "Пропуск {{segment}}",
-            "notSkipping": "Не пропускается {{segment}} (уже пропущено {{count}} раз)",
-            "skip": "Пропустить {{segment}}",
+            "skipping": "Пропускаем: {{segment}}",
+            "notSkipping": "Пропуск отменён: {{segment}} (попыток: {{count}})",
+            "skip": "Пропустить: {{segment}}",
             "skipToHighlight": "Перейти к ключевому моменту"
         }
     },
@@ -338,10 +338,10 @@
             "title": "Боковое меню обновлено",
             "subtitle": "Содержимое бокового меню обновлено."
         },
-        "feedbackSent": "Feedback sent."
+        "feedbackSent": "Отзыв отправлен."
     },
     "videoMenu": {
-        "notInterested": "Not interested",
-        "dontRecommendChannel": "Don't recommend channel"
+        "notInterested": "Не интересует",
+        "dontRecommendChannel": "Не рекомендовать канал"
     }
 }
