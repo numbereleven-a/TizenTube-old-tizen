@@ -3,3 +3,7 @@
 yt-spinner, yt-spinner * { color: transparent !important; text-shadow: none !important; }
 yt-spinner > * { opacity: 0 !important; visibility: hidden !important; }
 yt-spinner * { -webkit-animation: none !important; animation: none !important; }
+
+/* Tizen 3 (2017): the music layout hides the video element of art tracks, and the TV's
+   hardware player never starts a hidden video, so the song stalls at 0:00. Keep it visible. */
+video.html5-main-video { visibility: visible !important; }
