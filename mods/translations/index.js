@@ -1,7 +1,8 @@
 import i18n from 'i18next';
 import resources from './i18nResources.js';
 
-InitI18next(window?.yt?.config_?.HL || navigator.language.replace(/(\-.*)/g, ''));
+// Keep the region: pt-BR, pt-PT and es-419 only exist with it, and i18next falls back to the bare language by itself.
+InitI18next((window?.yt?.config_?.HL || navigator.language || '').replace('_', '-'));
 
 function InitI18next(lng) {
   i18n
