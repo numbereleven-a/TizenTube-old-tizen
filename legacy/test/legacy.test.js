@@ -734,7 +734,7 @@ test('historical service serves diagnostics and redacts incoming logs without di
 });
 
 
-test('frame reserves diagnostic keys on every event and leaves green for settings', () => {
+test('frame reserves only diagnostic colour keys and leaves number typing available', () => {
     const listeners = {}, commands = [];
     const document = { addEventListener(type, fn) { listeners[type] = fn; } };
     const window = { addEventListener() {} };
@@ -743,11 +743,14 @@ test('frame reserves diagnostic keys on every event and leaves green for setting
     });
     for (const type of ['keydown', 'keypress', 'keyup']) {
         let blocked = false, prevented = false;
-        listeners[type]({ type, keyCode: 49, preventDefault() { prevented = true; }, stopImmediatePropagation() { blocked = true; } });
+        listeners[type]({ type, keyCode: 403, preventDefault() { prevented = true; }, stopImmediatePropagation() { blocked = true; } });
         assert.equal(blocked, true); assert.equal(prevented, true);
+        blocked = false; prevented = false;
+        listeners[type]({ type, keyCode: 49, preventDefault() { prevented = true; }, stopImmediatePropagation() { blocked = true; } });
+        assert.equal(blocked, false); assert.equal(prevented, false);
         listeners[type]({ type, keyCode: 404, preventDefault() { assert.fail('green was reserved'); }, stopImmediatePropagation() { assert.fail('green was blocked'); } });
     }
-    assert.deepEqual(commands, [49]);
+    assert.deepEqual(commands, [403]);
 });
 
 test('loading feedback follows media events and visible spinners', () => {

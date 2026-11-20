@@ -1,4 +1,152 @@
 (function () {
+    // Some Samsung Bluetooth keyboards report letters as YouTube TV shortcut
+    // keys.  Send searchable characters through the visible TV keyboard,
+    // which follows the same code path as a remote-control selection.
+    if (window.__ttBluetoothKeyboard) return;
+    window.__ttBluetoothKeyboard = true;
+
+    var dispatching = false;
+    var named = {
+        Semicolon: [';', ':'], Comma: [',', '<'], Period: ['.', '>'], Slash: ['/', '?'],
+        Backslash: ['\\', '|'], BracketLeft: ['[', '{'], BracketRight: [']', '}'],
+        Minus: ['-', '_'], Equal: ['=', '+'], Quote: ["'", '"'], Grave: ['`', '~'],
+        Space: [' ', ' '], exclam: ['!', '!'], at: ['@', '@'], numbersign: ['#', '#'],
+        dollar: ['$', '$'], percent: ['%', '%'], ampersand: ['&', '&'], asterisk: ['*', '*'],
+        parenleft: ['(', '('], parenright: [')', ')'], underscore: ['_', '_'], plus: ['+', '+'],
+        colon: [':', ':'], quotedbl: ['"', '"'], question: ['?', '?'], less: ['<', '<'], greater: ['>', '>']
+    };
+    var shiftedDigits = [')', '!', '@', '#', '$', '%', '^', '&', '*', '('];
+    var keyCodes = {
+        186: [';', ':'], 187: ['=', '+'], 188: [',', '<'], 189: ['-', '_'],
+        190: ['.', '>'], 191: ['/', '?'], 192: ['`', '~'], 219: ['[', '{'],
+        220: ['\\', '|'], 221: [']', '}'], 222: ["'", '"']
+    };
+    var characterKeyCodes = {
+        ';': 186, ':': 186, '=': 187, '+': 187, ',': 188, '<': 188,
+        '-': 189, '_': 189, '.': 190, '>': 190, '/': 191, '?': 191,
+        '`': 192, '~': 192, '[': 219, '{': 219, '\\': 220, '|': 220,
+        ']': 221, '}': 221, "'": 222, '"': 222, ' ': 32
+    };
+
+    function isHex(value) { return value.length === 4 && /^[0-9a-f]+$/i.test(value); }
+    function decode(event) {
+        var identifier = event.keyIdentifier, key = event.key, shifted = !!event.shiftKey;
+        var code = event.keyCode || event.which;
+        if (typeof identifier === 'string') {
+            identifier = identifier.trim();
+            if (named[identifier]) return named[identifier][shifted ? 1 : 0];
+            if (identifier.slice(0, 2).toUpperCase() === 'U+') {
+                var hex = identifier.slice(2, 6);
+                if (isHex(hex)) {
+                    var charCode = parseInt(hex, 16);
+                    if (charCode >= 32 && charCode !== 127) {
+                        var character = String.fromCharCode(charCode);
+                        if (character >= 'a' && character <= 'z') return shifted ? character.toUpperCase() : character;
+                        if (character >= 'A' && character <= 'Z') return shifted ? character : character.toLowerCase();
+                        if (charCode >= 48 && charCode <= 57) return shifted ? shiftedDigits[charCode - 48] : character;
+                        if (characterKeyCodes[character] && keyCodes[characterKeyCodes[character]]) return keyCodes[characterKeyCodes[character]][shifted ? 1 : 0];
+                        return character;
+                    }
+                }
+            }
+        }
+        if (typeof key === 'string') {
+            if (named[key]) return named[key][shifted ? 1 : 0];
+            if (key.length === 1 && key.charCodeAt(0) >= 32) return key;
+        }
+        if (code >= 65 && code <= 90) {
+            var letter = String.fromCharCode(code);
+            return shifted ? letter : letter.toLowerCase();
+        }
+        if (code >= 48 && code <= 57) return shifted ? shiftedDigits[code - 48] : String.fromCharCode(code);
+        if (keyCodes[code]) return keyCodes[code][shifted ? 1 : 0];
+        return code === 32 ? ' ' : null;
+    }
+    function press(element) {
+        function mouse(type) {
+            var event = document.createEvent('MouseEvents');
+            event.initMouseEvent(type, true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+            element.dispatchEvent(event);
+        }
+        mouse('mousedown'); mouse('mouseup'); mouse('click');
+    }
+    function label(element) { return (element.textContent || '').replace(/\s+/g, '').toUpperCase(); }
+    function virtualKey(character) {
+        var wanted = String(character).toUpperCase();
+        var keys = document.querySelectorAll('yt-keyboard-key');
+        for (var index = 0; index < keys.length; index++) if (label(keys[index]) === wanted) return keys[index];
+        return null;
+    }
+    function keyboardReady() {
+        return !!(document.querySelector('ytlr-search-text-box') && document.querySelector('yt-keyboard-key'));
+    }
+    var opening = false;
+    function openSearch(done) {
+        if (keyboardReady()) { done(true); return; }
+        if (opening) { setTimeout(function () { openSearch(done); }, 100); return; }
+        opening = true;
+        var candidates = document.querySelectorAll('ytlr-search-button,[aria-label="Search"],[title="Search"]');
+        for (var index = 0; index < candidates.length; index++) {
+            var rect = candidates[index].getBoundingClientRect();
+            if (rect.width && rect.height) { press(candidates[index]); break; }
+        }
+        var tries = 0;
+        function wait() {
+            if (keyboardReady()) { opening = false; done(true); return; }
+            if (++tries >= 30) { opening = false; done(false); return; }
+            setTimeout(wait, 100);
+        }
+        wait();
+    }
+    var queue = [], busy = false;
+    function process() {
+        if (!queue.length) { busy = false; return; }
+        if (!keyboardReady()) {
+            openSearch(function (ready) { if (ready) process(); else { queue = []; busy = false; } });
+            return;
+        }
+        var character = queue.shift();
+        var key = virtualKey(character);
+        if (key) { press(key); setTimeout(process, 25); return; }
+        var letters = /^[A-Za-z]$/.test(character);
+        var keys = document.querySelectorAll('yt-keyboard-key');
+        var modeKey = null;
+        for (var index = 0; index < keys.length; index++) {
+            var mode = label(keys[index]);
+            if (letters ? mode === 'ABC' || mode === 'ABCD' : mode === '&123' || mode === '123') { modeKey = keys[index]; break; }
+        }
+        if (!modeKey) { setTimeout(process, 25); return; }
+        press(modeKey);
+        setTimeout(function () { var switched = virtualKey(character); if (switched) press(switched); setTimeout(process, 75); }, 100);
+    }
+    function enqueue(character) { queue.push(character); if (!busy) { busy = true; process(); } }
+    function virtualBackspace() {
+        var keys = document.querySelectorAll('yt-keyboard-key');
+        for (var index = 0; index < keys.length; index++) {
+            var details = ((keys[index].getAttribute('aria-label') || '') + ' ' + (keys[index].outerHTML || '')).toLowerCase();
+            if (/backspace|back-space|delete|erase/.test(details)) { press(keys[index]); return; }
+        }
+    }
+    function handle(event) {
+        if (dispatching || event._ttClean) return;
+        var code = event.keyCode || event.which;
+        if (code === 10009 || code === 27 || code === 13 || (code >= 37 && code <= 40) || (code >= 403 && code <= 406) || code === 447 || code === 448 || code === 449) return;
+        if (code === 8 || code === 46 || event.keyIdentifier === 'U+0008' || event.keyIdentifier === 'Delete' || event.key === 'Delete') {
+            event.preventDefault(); event.stopImmediatePropagation();
+            if (event.type === 'keydown') virtualBackspace();
+            return;
+        }
+        var character = decode(event);
+        if (character === null) return;
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (event.type === 'keydown') enqueue(character);
+    }
+    window.addEventListener('keydown', handle, true);
+    window.addEventListener('keypress', handle, true);
+    window.addEventListener('keyup', handle, true);
+})();
+
+(function () {
     'use strict';
     function report(entry) {
         if (parent !== window) {
@@ -24,7 +172,7 @@
     }, true);
     function diagnosticKey(event) {
         var key = event.keyCode;
-        if (key === 403 || key === 406 || key === 49 || key === 50 || key === 52) {
+        if (key === 403 || key === 406) {
             if (parent !== window) {
                 if (event.type === 'keydown') parent.__legacyCommand(key);
                 event.preventDefault(); event.stopImmediatePropagation();
